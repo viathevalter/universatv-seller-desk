@@ -90,8 +90,8 @@ const UpdateURL = () => {
                     <button
                         onClick={() => setActiveTab('url')}
                         className={`flex-1 py-4 text-sm font-bold uppercase tracking-wider transition-colors ${activeTab === 'url'
-                                ? 'bg-surface text-primary border-t-2 border-primary'
-                                : 'text-textMuted hover:text-textMain hover:bg-surfaceHighlight'
+                            ? 'bg-surface text-primary border-t-2 border-primary'
+                            : 'text-textMuted hover:text-textMain hover:bg-surfaceHighlight'
                             }`}
                     >
                         Colar URL do Painel
@@ -99,8 +99,8 @@ const UpdateURL = () => {
                     <button
                         onClick={() => setActiveTab('credentials')}
                         className={`flex-1 py-4 text-sm font-bold uppercase tracking-wider transition-colors ${activeTab === 'credentials'
-                                ? 'bg-surface text-primary border-t-2 border-primary'
-                                : 'text-textMuted hover:text-textMain hover:bg-surfaceHighlight'
+                            ? 'bg-surface text-primary border-t-2 border-primary'
+                            : 'text-textMuted hover:text-textMain hover:bg-surfaceHighlight'
                             }`}
                     >
                         Gerar por Credenciais
@@ -141,13 +141,13 @@ const UpdateURL = () => {
 
                             <div>
                                 <label className="block text-xs font-bold text-textMuted uppercase mb-2">URL Final (com VPS)</label>
-                                <div className="relative">
-                                    <Input value={finalUrl} readOnly className="pr-32 font-mono text-sm bg-surfaceHighlight/20" />
-                                    <div className="absolute right-1 top-1 bottom-1 flex gap-1">
+                                <div className="space-y-4">
+                                    <Input value={finalUrl} readOnly className="font-mono text-sm bg-surfaceHighlight/20 p-4 min-h-[50px] text-lg" />
+                                    <div className="flex gap-4">
                                         <Button
                                             onClick={() => setOriginalUrl('')}
                                             variant="ghost"
-                                            className="h-full px-3 text-textMuted hover:text-red-400"
+                                            className="flex-1 py-6 text-base border border-border"
                                             title="Limpar"
                                         >
                                             Limpar
@@ -155,9 +155,9 @@ const UpdateURL = () => {
                                         <Button
                                             onClick={() => handleCopy(finalUrl)}
                                             disabled={!finalUrl}
-                                            className="h-full px-4 bg-primary text-white hover:bg-primaryHover disabled:opacity-50 disabled:cursor-not-allowed"
+                                            className="flex-[2] py-6 text-base bg-primary text-white hover:bg-primaryHover disabled:opacity-50 disabled:cursor-not-allowed font-bold shadow-lg"
                                         >
-                                            <Copy size={16} className="mr-2" /> Copiar
+                                            <Copy size={20} className="mr-2" /> Copiar URL Final
                                         </Button>
                                     </div>
                                 </div>
