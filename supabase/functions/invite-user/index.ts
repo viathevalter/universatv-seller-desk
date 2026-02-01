@@ -13,21 +13,16 @@ serve(async (req) => {
     }
 
     try {
-        const supabaseClient = createClient(
-            Deno.env.get('SUPABASE_URL') ?? '',
-            Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-            { global: { headers: { Authorization: req.headers.get('Authorization')! } } }
-        )
+        console.log("Request received");
+        const authHeader = req.headers.get('Authorization');
+        console.log("Auth Header present:", !!authHeader);
 
-        // Check if the user is authenticated and is an admin (optional strictly, but good practice)
-        // For now, we rely on RLS policies or just authentication. 
-        // Ideally, check if user.role or a profile field allows this.
-        // Here we will assume any authenticated user with access to the Admin UI (protected by RLS/Page logic) can call this *if* they have the token.
-        // A stricter check would be:
-        // const { data: { user }, error: userError } = await supabaseClient.auth.getUser()
-        // if (userError || !user) throw new Error('Unauthorized')
+        if (!authHeader) {
+            throw new Error('Missing Authorization header');
+        }
 
         const { email, password, name, role } = await req.json()
+        console.log("Payload:", { email, name, role });
 
         if (!email || !password || !name) {
             return new Response(
@@ -36,27 +31,29 @@ serve(async (req) => {
             )
         }
 
-        // Create Supabase Admin Client (Service Role)
-        // This allows us to create users bypassing email verification if needed, or just standard invite
         const supabaseAdmin = createClient(
             Deno.env.get('SUPABASE_URL') ?? '',
             Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
         )
 
         // 1. Create the user in Auth
+        console.log("Creating user in Auth...");
         const { data: userData, error: createError } = await supabaseAdmin.auth.admin.createUser({
             email: email,
             password: password,
-            email_confirm: true, // Auto-confirm for now as we are admin creating it
+            email_confirm: true,
             user_metadata: { name: name }
         })
 
-        if (createError) throw createError
+        if (createError) {
+            console.error("Auth Create Error:", createError);
+            throw createError
+        }
 
         if (!userData.user) throw new Error('User creation failed')
 
         // 2. Insert into profiles table
-        // Note: The triggers might handle this if you have them, but explicit insertion ensures data consistency with params
+        console.log("Upserting profile...");
         const { error: profileError } = await supabaseAdmin
             .from('profiles')
             .upsert({
@@ -67,8 +64,7 @@ serve(async (req) => {
             })
 
         if (profileError) {
-            // Cleanup if profile fails? Or just return error. 
-            // For now, return error but user is created.
+            console.error("Profile Error:", profileError);
             return new Response(
                 JSON.stringify({ error: 'User created but profile failed: ' + profileError.message }),
                 { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
@@ -81,9 +77,10 @@ serve(async (req) => {
         )
 
     } catch (error) {
+        console.error("Global Catch:", error);
         return new Response(
             JSON.stringify({ error: error.message }),
-            { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+            { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 } // Returning 400 to distinguish from Gateway 401
         )
     }
 })
