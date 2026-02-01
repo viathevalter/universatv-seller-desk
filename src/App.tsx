@@ -13,6 +13,7 @@ import Support from './pages/Support';
 import Admin from './pages/Admin';
 import Translator from './pages/Translator';
 import Tasks from './pages/Tasks';
+import UpdateURL from './pages/UpdateURL';
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
@@ -48,6 +49,7 @@ const App = () => {
                 <Route path="tarefas" element={<Tasks />} />
                 <Route path="pagamentos" element={<Payments />} />
                 <Route path="apps" element={<Apps />} />
+                <Route path="update-url" element={<UpdateURL />} />
                 <Route path="suporte" element={<Support />} />
                 <Route path="tradutor" element={<Translator />} />
                 <Route path="admin" element={<Admin />} />

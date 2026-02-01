@@ -4,11 +4,11 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'ghost' | 'destructive';
 }
 
-export const Button: React.FC<ButtonProps> = ({ 
-  children, 
-  variant = 'primary', 
-  className = '', 
-  ...props 
+export const Button: React.FC<ButtonProps> = ({
+  children,
+  variant = 'primary',
+  className = '',
+  ...props
 }) => {
   const base = "px-4 py-2 rounded-md font-medium transition-all duration-200 flex items-center justify-center gap-2";
   const variants = {
@@ -37,14 +37,14 @@ export const Card: React.FC<CardProps> = ({ children, className = '' }) => (
 );
 
 export const Input: React.FC<React.InputHTMLAttributes<HTMLInputElement>> = (props) => (
-  <input 
+  <input
     className="w-full bg-background border border-border rounded-md px-3 py-2 text-textMain placeholder-textMuted focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
     {...props}
   />
 );
 
 export const Textarea: React.FC<React.TextareaHTMLAttributes<HTMLTextAreaElement>> = (props) => (
-  <textarea 
+  <textarea
     className="w-full bg-background border border-border rounded-md px-3 py-2 text-textMain placeholder-textMuted focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all min-h-[100px]"
     {...props}
   />
@@ -70,5 +70,19 @@ export const Toast: React.FC<ToastProps> = ({ message, visible }) => (
   <div className={`fixed bottom-8 right-8 bg-surfaceHighlight border border-primary text-textMain px-4 py-3 rounded-lg shadow-xl transform transition-all duration-300 z-50 flex items-center gap-3 ${visible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
     <div className="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
     {message}
+  </div>
+);
+
+export const Select: React.FC<React.SelectHTMLAttributes<HTMLSelectElement>> = (props) => (
+  <div className="relative">
+    <select
+      className="w-full bg-background border border-border rounded-md px-3 py-2 text-textMain placeholder-textMuted focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all appearance-none cursor-pointer"
+      {...props}
+    />
+    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-textMuted">
+      <svg width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    </div>
   </div>
 );
