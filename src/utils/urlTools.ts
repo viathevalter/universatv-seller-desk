@@ -20,3 +20,20 @@ export const buildM3U = (vps: string, username: string, password: string, output
     const type = 'm3u_plus';
     return `${cleanBase}/get.php?username=${username}&password=${password}&type=${type}&output=${output}`;
 };
+
+export const extractCredentials = (url: string): { username?: string, password?: string } | null => {
+    try {
+        const u = new URL(url);
+        const username = u.searchParams.get('username');
+        const password = u.searchParams.get('password');
+        if (username || password) {
+            return {
+                username: username || undefined,
+                password: password || undefined
+            };
+        }
+        return null;
+    } catch {
+        return null;
+    }
+};

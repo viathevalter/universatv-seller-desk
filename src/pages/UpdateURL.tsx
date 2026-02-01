@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useI18n } from '../lib/i18n';
 import { Card, Button, Input, Select, Badge, Toast } from '../components/ui/LayoutComponents';
-import { Copy, Link as LinkIcon, AlertCircle, CheckCircle } from 'lucide-react';
-import { replaceBaseUrl, buildM3U } from '../utils/urlTools';
+import { Copy, Link as LinkIcon, AlertCircle, CheckCircle, Download } from 'lucide-react';
+import { replaceBaseUrl, buildM3U, extractCredentials } from '../utils/urlTools';
 
 const VPS_LIST = [
     'http://sharkvpn.unilafour.xyz',
@@ -68,6 +68,27 @@ const UpdateURL = () => {
             setOriginalUrl(text);
         } catch {
             alert(t('updateUrl.pasteError'));
+        }
+    };
+
+    const handleImportCredentials = async () => {
+        try {
+            const text = await navigator.clipboard.readText();
+            const creds = extractCredentials(text);
+            if (creds && (creds.username || creds.password)) {
+                if (creds.username) setUsername(creds.username);
+                if (creds.password) setPassword(creds.password);
+                setToastMessage(t('updateUrl.importSuccess'));
+                setToastVisible(true);
+            } else {
+                setToastMessage(t('updateUrl.importError'));
+                setToastVisible(true);
+            }
+            setTimeout(() => setToastVisible(false), 2000);
+        } catch {
+            setToastMessage(t('updateUrl.pasteError'));
+            setToastVisible(true);
+            setTimeout(() => setToastVisible(false), 2000);
         }
     };
 
@@ -170,6 +191,11 @@ const UpdateURL = () => {
                     ) : (
                         /* TAB 2 CONTENT */
                         <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+                            <div className="flex justify-end">
+                                <button onClick={handleImportCredentials} className="text-xs text-primary hover:underline font-bold flex items-center gap-1">
+                                    <Download size={14} /> {t('updateUrl.importUrl')}
+                                </button>
+                            </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label className="block text-xs font-bold text-textMuted uppercase mb-2">{t('updateUrl.username')}</label>

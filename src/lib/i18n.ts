@@ -69,6 +69,9 @@ const translations: Record<string, Record<Language, string>> = {
   'updateUrl.copyXtream': { pt: 'Copiar Xtream', es: 'Copiar Xtream' },
   'updateUrl.copied': { pt: 'Copiado para a área de transferência!', es: '¡Copiado al portapapeles!' },
   'updateUrl.pasteError': { pt: 'Permissão para colar negada ou não suportada.', es: 'Permiso para pegar denegado o no soportado.' },
+  'updateUrl.importUrl': { pt: 'Colar URL para Extrair Credenciais', es: 'Pegar URL para Extraer Credenciales' },
+  'updateUrl.importSuccess': { pt: 'Credenciais extraídas com sucesso!', es: '¡Credenciales extraídas con éxito!' },
+  'updateUrl.importError': { pt: 'Não foi possível encontrar credenciais na URL.', es: 'No se pudieron encontrar credenciales en la URL.' },
 
   // Translator Module
   'trans.title': { pt: 'Agente Tradutor', es: 'Agente Traductor' },
