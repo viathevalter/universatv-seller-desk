@@ -4,7 +4,7 @@ import { supabase } from '../lib/supabase';
 import { AppItem } from '../types';
 import { Card, Button, Input, Badge, Toast, Textarea } from '../components/ui/LayoutComponents';
 import { WhatsAppEditor } from '../components/ui/WhatsAppEditor';
-import { Search, Copy, Download, ExternalLink, Smartphone, Maximize2, X, Plus, Edit2, Trash2, Save } from 'lucide-react';
+import { Search, Copy, Download, ExternalLink, Smartphone, Maximize2, X, Plus, Edit2, Trash2, Save, Upload } from 'lucide-react';
 
 const Apps = () => {
     const { t, language } = useI18n();
@@ -19,6 +19,7 @@ const Apps = () => {
     // Modal State
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
+    const [uploading, setUploading] = useState(false);
 
     // Form State
     const [formName, setFormName] = useState('');
@@ -69,6 +70,41 @@ const Apps = () => {
         navigator.clipboard.writeText(text);
         setToastVisible(true);
         setTimeout(() => setToastVisible(false), 2000);
+    };
+
+    const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (!event.target.files || event.target.files.length === 0) {
+            return;
+        }
+
+        try {
+            setUploading(true);
+            const file = event.target.files[0];
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${Math.random()}.${fileExt}`;
+            const filePath = `${fileName}`;
+
+            const { error: uploadError } = await supabase.storage
+                .from('app-images')
+                .upload(filePath, file);
+
+            if (uploadError) {
+                throw uploadError;
+            }
+
+            const { data } = supabase.storage
+                .from('app-images')
+                .getPublicUrl(filePath);
+
+            if (data) {
+                setFormImageMain(data.publicUrl);
+            }
+        } catch (error) {
+            console.error('Error uploading image:', error);
+            alert('Erro ao fazer upload da imagem.');
+        } finally {
+            setUploading(false);
+        }
     };
 
     const handleDelete = async (id: string) => {
@@ -203,7 +239,7 @@ const Apps = () => {
                                     : 'bg-surface border-border hover:border-primary/50'
                                 }`}
                         >
-                            <img src={app.image_main_url} className="w-12 h-12 rounded object-cover bg-black shrink-0" alt="" />
+                            <img src={app.image_main_url || 'https://placehold.co/400x400?text=No+Image'} className="w-12 h-12 rounded object-cover bg-black shrink-0" alt="" />
                             <div className="overflow-hidden flex-1">
                                 <h4 className={`font-semibold truncate ${selectedApp?.id === app.id ? 'text-primary' : 'text-textMain'}`}>{app.name}</h4>
                                 <div className="flex gap-1 mt-1 overflow-hidden">
@@ -265,7 +301,7 @@ const Apps = () => {
                         <div className="mb-8 p-4 bg-background rounded-xl border-2 border-dashed border-border flex flex-col items-center">
                             <div className="relative group cursor-grab active:cursor-grabbing">
                                 <img
-                                    src={selectedApp.image_main_url}
+                                    src={selectedApp.image_main_url || 'https://placehold.co/600x400?text=No+Image'}
                                     alt={selectedApp.name}
                                     className="h-64 rounded-lg object-contain shadow-2xl"
                                     draggable="true"
@@ -418,7 +454,25 @@ const Apps = () => {
 
                             <div>
                                 <label className="block text-xs font-bold text-textMuted uppercase mb-2">URL Imagem Principal</label>
-                                <Input value={formImageMain} onChange={e => setFormImageMain(e.target.value)} placeholder="https://..." />
+                                <Input value={formImageMain} readOnly className="mb-2 bg-background/50 text-textMuted" placeholder="URL da imagem será gerada automaticamente..." />
+                                <div className="flex items-center gap-2">
+                                    <Button
+                                        type="button"
+                                        variant="secondary"
+                                        onClick={() => document.getElementById('imageUpload')?.click()}
+                                        disabled={uploading}
+                                    >
+                                        {uploading ? 'Enviando...' : <><Upload size={16} /> Fazer Upload de Imagem</>}
+                                    </Button>
+                                    <input
+                                        type="file"
+                                        id="imageUpload"
+                                        className="hidden"
+                                        accept="image/*"
+                                        onChange={handleImageUpload}
+                                    />
+                                    {formImageMain && <span className="text-green-500 text-xs flex items-center gap-1">Imagem carregada!</span>}
+                                </div>
                             </div>
 
                             {/* Stacked Instructions */}
