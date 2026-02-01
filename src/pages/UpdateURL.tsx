@@ -55,6 +55,17 @@ const UpdateURL = () => {
         }
     }, [originalUrl, vps]);
 
+    // Sync credentials from URL tab to Credentials tab
+    useEffect(() => {
+        if (originalUrl) {
+            const creds = extractCredentials(originalUrl);
+            if (creds) {
+                if (creds.username) setUsername(creds.username);
+                if (creds.password) setPassword(creds.password);
+            }
+        }
+    }, [originalUrl]);
+
     const handleCopy = (text: string) => {
         navigator.clipboard.writeText(text);
         setToastMessage(t('updateUrl.copied'));
