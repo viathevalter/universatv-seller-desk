@@ -89,7 +89,7 @@ export const AppLayout = () => {
           <SidebarItem to="/app/tarefas" icon={ClipboardList} label={t('nav.tasks')} badgeCount={overdueCount} />
           <SidebarItem to="/app/pagamentos" icon={CreditCard} label={t('nav.payments')} />
           <SidebarItem to="/app/apps" icon={AppWindow} label={t('nav.apps')} />
-          <SidebarItem to="/app/update-url" icon={Link} label="UpdateURL" />
+          <SidebarItem to="/app/update-url" icon={Link} label={t('nav.updateUrl')} />
           <SidebarItem to="/app/suporte" icon={LifeBuoy} label={t('nav.support')} />
           <div className="my-2 border-t border-border/50"></div>
           <SidebarItem to="/app/tradutor" icon={Languages} label={t('nav.translator')} />

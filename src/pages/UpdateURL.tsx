@@ -1,5 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
+import { useI18n } from '../lib/i18n';
 import { Card, Button, Input, Select, Badge, Toast } from '../components/ui/LayoutComponents';
 import { Copy, Link as LinkIcon, AlertCircle, CheckCircle } from 'lucide-react';
 import { replaceBaseUrl, buildM3U } from '../utils/urlTools';
@@ -12,6 +12,7 @@ const VPS_LIST = [
 ];
 
 const UpdateURL = () => {
+    const { t } = useI18n();
     const [activeTab, setActiveTab] = useState<'url' | 'credentials'>('url');
     const [vps, setVps] = useState(VPS_LIST[0]);
     const [toastVisible, setToastVisible] = useState(false);
@@ -56,7 +57,7 @@ const UpdateURL = () => {
 
     const handleCopy = (text: string) => {
         navigator.clipboard.writeText(text);
-        setToastMessage('Copiado para a área de transferência!');
+        setToastMessage(t('updateUrl.copied'));
         setToastVisible(true);
         setTimeout(() => setToastVisible(false), 2000);
     };
@@ -66,7 +67,7 @@ const UpdateURL = () => {
             const text = await navigator.clipboard.readText();
             setOriginalUrl(text);
         } catch {
-            alert('Permissão para colar negada ou não suportada.');
+            alert(t('updateUrl.pasteError'));
         }
     };
 
@@ -74,14 +75,15 @@ const UpdateURL = () => {
     const m3uTs = buildM3U(vps, username, password, 'ts');
     const m3u8 = buildM3U(vps, username, password, 'm3u8');
     const xtreamLines = `Server: ${vps}\nUsername: ${username}\nPassword: ${password}`;
+    const accessLines = `Username: ${username}\nPassword: ${password}\nURL: ${vps}`;
 
     return (
         <div className="max-w-4xl mx-auto">
             <div className="mb-6">
                 <h1 className="text-3xl font-bold text-textMain mb-2 flex items-center gap-2">
-                    <LinkIcon className="text-primary" /> UpdateURL
+                    <LinkIcon className="text-primary" /> {t('updateUrl.title')}
                 </h1>
-                <p className="text-textMuted">Cole a URL do painel e gere a versão com VPS.</p>
+                <p className="text-textMuted">{t('updateUrl.subtitle')}</p>
             </div>
 
             <Card className="p-0 overflow-hidden bg-surface border-border">
@@ -94,7 +96,7 @@ const UpdateURL = () => {
                             : 'text-textMuted hover:text-textMain hover:bg-surfaceHighlight'
                             }`}
                     >
-                        Colar URL do Painel
+                        {t('updateUrl.tab.url')}
                     </button>
                     <button
                         onClick={() => setActiveTab('credentials')}
@@ -103,14 +105,14 @@ const UpdateURL = () => {
                             : 'text-textMuted hover:text-textMain hover:bg-surfaceHighlight'
                             }`}
                     >
-                        Gerar por Credenciais
+                        {t('updateUrl.tab.credentials')}
                     </button>
                 </div>
 
                 <div className="p-8 space-y-8">
                     {/* Common VPS Select */}
                     <div className="w-full md:w-1/2">
-                        <label className="block text-xs font-bold text-textMuted uppercase mb-2">VPS Destino</label>
+                        <label className="block text-xs font-bold text-textMuted uppercase mb-2">{t('updateUrl.vps')}</label>
                         <Select value={vps} onChange={(e) => handleVpsChange(e.target.value)}>
                             {VPS_LIST.map((v) => (
                                 <option key={v} value={v}>{v}</option>
@@ -123,43 +125,43 @@ const UpdateURL = () => {
                         <div className="space-y-6 animate-in fade-in slide-in-from-left-4 duration-300">
                             <div>
                                 <div className="flex justify-between mb-2">
-                                    <label className="block text-xs font-bold text-textMuted uppercase">URL Original do Painel</label>
-                                    <button onClick={handlePaste} className="text-xs text-primary hover:underline font-bold">Colar do Clipboard</button>
+                                    <label className="block text-xs font-bold text-textMuted uppercase">{t('updateUrl.originalUrl')}</label>
+                                    <button onClick={handlePaste} className="text-xs text-primary hover:underline font-bold">{t('updateUrl.paste')}</button>
                                 </div>
                                 <textarea
                                     value={originalUrl}
                                     onChange={(e) => setOriginalUrl(e.target.value)}
                                     className="w-full bg-background border border-border rounded-lg p-3 text-sm text-textMain focus:ring-2 focus:ring-primary focus:outline-none min-h-[100px] font-mono"
-                                    placeholder="Ex: http://cf.business-cdn-8k.ru/get.php?username=..."
+                                    placeholder={t('updateUrl.placeholder')}
                                 />
                                 {originalUrl && !finalUrl && (
                                     <span className="text-red-500 text-xs mt-1 flex items-center gap-1">
-                                        <AlertCircle size={12} /> Cole uma URL válida (http://...)
+                                        <AlertCircle size={12} /> {t('updateUrl.error')}
                                     </span>
                                 )}
                             </div>
 
                             <div>
-                                <label className="block text-xs font-bold text-textMuted uppercase mb-2">URL Final (com VPS)</label>
+                                <label className="block text-xs font-bold text-textMuted uppercase mb-2">{t('updateUrl.finalUrl')}</label>
                                 <div className="space-y-4">
                                     <div className="w-full bg-surfaceHighlight/20 border border-border rounded-lg p-4 font-mono text-lg text-textMain break-all min-h-[80px] flex items-center">
-                                        {finalUrl || <span className="text-textMuted opacity-50">A URL gerada aparecerá aqui...</span>}
+                                        {finalUrl || <span className="text-textMuted opacity-50">{t('updateUrl.generating')}</span>}
                                     </div>
                                     <div className="flex gap-4">
                                         <Button
                                             onClick={() => setOriginalUrl('')}
                                             variant="ghost"
                                             className="flex-1 py-6 text-base border border-border"
-                                            title="Limpar"
+                                            title={t('updateUrl.clear')}
                                         >
-                                            Limpar
+                                            {t('updateUrl.clear')}
                                         </Button>
                                         <Button
                                             onClick={() => handleCopy(finalUrl)}
                                             disabled={!finalUrl}
                                             className="flex-[2] py-6 text-base bg-primary text-white hover:bg-primaryHover disabled:opacity-50 disabled:cursor-not-allowed font-bold shadow-lg"
                                         >
-                                            <Copy size={20} className="mr-2" /> Copiar URL Final
+                                            <Copy size={20} className="mr-2" /> {t('updateUrl.copyFinal')}
                                         </Button>
                                     </div>
                                 </div>
@@ -170,17 +172,17 @@ const UpdateURL = () => {
                         <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                    <label className="block text-xs font-bold text-textMuted uppercase mb-2">Username</label>
+                                    <label className="block text-xs font-bold text-textMuted uppercase mb-2">{t('updateUrl.username')}</label>
                                     <Input value={username} onChange={e => setUsername(e.target.value)} placeholder="Ex: maria25" />
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-bold text-textMuted uppercase mb-2">Password</label>
+                                    <label className="block text-xs font-bold text-textMuted uppercase mb-2">{t('updateUrl.password')}</label>
                                     <Input value={password} onChange={e => setPassword(e.target.value)} placeholder="Ex: 123456" />
                                 </div>
                             </div>
 
                             <div className="w-full md:w-1/3">
-                                <label className="block text-xs font-bold text-textMuted uppercase mb-2">Output</label>
+                                <label className="block text-xs font-bold text-textMuted uppercase mb-2">{t('updateUrl.output')}</label>
                                 <Select value={outputType} onChange={(e) => setOutputType(e.target.value as any)}>
                                     <option value="ts">ts (arquivo .ts)</option>
                                     <option value="m3u8">m3u8 (HLS)</option>
@@ -191,7 +193,7 @@ const UpdateURL = () => {
                                 <div>
                                     <div className="flex justify-between items-center mb-1">
                                         <label className="text-xs font-bold text-textMuted">M3U (TS)</label>
-                                        <Button size="sm" variant="secondary" onClick={() => handleCopy(m3uTs)}><Copy size={12} className="mr-1" /> Copiar M3U TS</Button>
+                                        <Button size="sm" variant="secondary" onClick={() => handleCopy(m3uTs)}><Copy size={12} className="mr-1" /> {t('updateUrl.copyM3uTs')}</Button>
                                     </div>
                                     <div className="bg-background p-3 rounded border border-border font-mono text-xs text-textMuted break-all">{m3uTs}</div>
                                 </div>
@@ -199,15 +201,23 @@ const UpdateURL = () => {
                                 <div>
                                     <div className="flex justify-between items-center mb-1">
                                         <label className="text-xs font-bold text-textMuted">M3U (M3U8)</label>
-                                        <Button size="sm" variant="secondary" onClick={() => handleCopy(m3u8)}><Copy size={12} className="mr-1" /> Copiar M3U8</Button>
+                                        <Button size="sm" variant="secondary" onClick={() => handleCopy(m3u8)}><Copy size={12} className="mr-1" /> {t('updateUrl.copyM3u8')}</Button>
                                     </div>
                                     <div className="bg-background p-3 rounded border border-border font-mono text-xs text-textMuted break-all">{m3u8}</div>
                                 </div>
 
                                 <div>
                                     <div className="flex justify-between items-center mb-1">
-                                        <label className="text-xs font-bold text-textMuted">Xtream Codes</label>
-                                        <Button size="sm" variant="secondary" onClick={() => handleCopy(xtreamLines)}><Copy size={12} className="mr-1" /> Copiar Xtream (3 linhas)</Button>
+                                        <label className="text-xs font-bold text-textMuted">{t('updateUrl.accessData')}</label>
+                                        <Button size="sm" variant="secondary" onClick={() => handleCopy(accessLines)} className="bg-primary/20 text-primary border-primary/20 hover:bg-primary/30"><Copy size={12} className="mr-1" /> {t('updateUrl.copyAccess')}</Button>
+                                    </div>
+                                    <pre className="bg-background p-3 rounded border border-border font-mono text-xs text-textMuted whitespace-pre-wrap">{accessLines}</pre>
+                                </div>
+
+                                <div>
+                                    <div className="flex justify-between items-center mb-1">
+                                        <label className="text-xs font-bold text-textMuted">{t('updateUrl.xtream')}</label>
+                                        <Button size="sm" variant="secondary" onClick={() => handleCopy(xtreamLines)}><Copy size={12} className="mr-1" /> {t('updateUrl.copyXtream')}</Button>
                                     </div>
                                     <pre className="bg-background p-3 rounded border border-border font-mono text-xs text-textMuted whitespace-pre-wrap">{xtreamLines}</pre>
                                 </div>
