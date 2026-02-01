@@ -21,6 +21,7 @@ export const UserManagement = () => {
     // New User State
     const [newName, setNewName] = useState('');
     const [newEmail, setNewEmail] = useState('');
+    const [newPassword, setNewPassword] = useState('');
     const [newRole, setNewRole] = useState('seller');
 
     const [toastMessage, setToastMessage] = useState('');
@@ -39,21 +40,36 @@ export const UserManagement = () => {
 
     const handleCreateUser = async (e: React.FormEvent) => {
         e.preventDefault();
-        // NOTE: Client-side creation without logging out is not natively supported by Supabase Client SDK.
-        // We would typically use an Edge Function or "Invite" API.
-        // For this demo, we will insert a profile row to simulate "Pre-registration" if RLS allows, 
-        // or show a message that this requires an invitation link.
 
-        // Simulating the UI flow:
-        setToastMessage(t('admin.users.createSuccess'));
-        setToastVisible(true);
+        try {
+            const { data, error } = await supabase.functions.invoke('invite-user', {
+                body: {
+                    email: newEmail,
+                    password: newPassword,
+                    name: newName,
+                    role: newRole
+                }
+            });
+
+            if (error) throw new Error(error.message || 'Error executing function');
+            if (data?.error) throw new Error(data.error);
+
+            setToastMessage(t('admin.users.createSuccess'));
+            setToastVisible(true);
+
+            // Refresh list
+            fetchProfiles();
+
+            setIsCreating(false);
+            setNewName('');
+            setNewEmail('');
+            setNewPassword('');
+        } catch (err: any) {
+            setToastMessage(t('common.error') + ': ' + err.message);
+            setToastVisible(true);
+        }
+
         setTimeout(() => setToastVisible(false), 3000);
-        setIsCreating(false);
-        setNewName('');
-        setNewEmail('');
-
-        // In a real app with Admin API:
-        // await supabase.auth.admin.inviteUserByEmail(newEmail);
     };
 
     return (
@@ -78,6 +94,10 @@ export const UserManagement = () => {
                                 <label className="block text-xs font-bold text-textMuted uppercase mb-2">{t('admin.users.email')}</label>
                                 <Input required type="email" value={newEmail} onChange={e => setNewEmail(e.target.value)} placeholder="Ex: joao@universatv.com" />
                             </div>
+                        </div>
+                        <div>
+                            <label className="block text-xs font-bold text-textMuted uppercase mb-2">{t('login.password')}</label>
+                            <Input required type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} placeholder="*******" />
                         </div>
                         <div>
                             <label className="block text-xs font-bold text-textMuted uppercase mb-2">{t('admin.users.role')}</label>
