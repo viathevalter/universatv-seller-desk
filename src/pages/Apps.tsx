@@ -4,7 +4,7 @@ import { supabase } from '../lib/supabase';
 import { AppItem } from '../types';
 import { Card, Button, Input, Badge, Toast, Textarea } from '../components/ui/LayoutComponents';
 import { WhatsAppEditor } from '../components/ui/WhatsAppEditor';
-import { Search, Copy, Download, ExternalLink, Smartphone, Maximize2, X, Plus, Edit2, Trash2, Save, Upload } from 'lucide-react';
+import { Search, Copy, Download, ExternalLink, Smartphone, Maximize2, X, Plus, Edit2, Trash2, Save, Upload, Image as ImageIcon } from 'lucide-react';
 
 const Apps = () => {
     const { t, language } = useI18n();
@@ -12,6 +12,7 @@ const Apps = () => {
     const [selectedApp, setSelectedApp] = useState<AppItem | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [toastVisible, setToastVisible] = useState(false);
+    const [toastMessage, setToastMessage] = useState('');
     const [zoomedImage, setZoomedImage] = useState<string | null>(null);
     const [activeTab, setActiveTab] = useState<'pt' | 'es'>('pt');
     const [loading, setLoading] = useState(true);
@@ -66,10 +67,36 @@ const Apps = () => {
         app.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    const handleCopy = (text: string) => {
-        navigator.clipboard.writeText(text);
+    const showToast = (msg: string) => {
+        setToastMessage(msg);
         setToastVisible(true);
         setTimeout(() => setToastVisible(false), 2000);
+    };
+
+    const handleCopy = (text: string) => {
+        navigator.clipboard.writeText(text);
+        showToast(t('common.copied'));
+    };
+
+    const handleCopyImage = async (imageUrl: string) => {
+        if (!imageUrl) return;
+
+        try {
+            showToast('Baixando imagem...');
+            // Fetch the image as a blob
+            const response = await fetch(imageUrl);
+            const blob = await response.blob();
+
+            // Create a new ClipboardItem with the blob
+            // Note: Browser support for writing images to clipboard requires secure context (HTTPS)
+            const item = new ClipboardItem({ [blob.type]: blob });
+            await navigator.clipboard.write([item]);
+
+            showToast('Imagem copiada! Cole no WhatsApp (Ctrl+V)');
+        } catch (error) {
+            console.error('Error copying image:', error);
+            showToast('Erro ao copiar imagem. Tente baixar.');
+        }
     };
 
     const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -299,26 +326,29 @@ const Apps = () => {
 
                         {/* Draggable Main Image */}
                         <div className="mb-8 p-4 bg-background rounded-xl border-2 border-dashed border-border flex flex-col items-center">
-                            <div className="relative group cursor-grab active:cursor-grabbing">
+                            <div className="relative group mb-4">
                                 <img
                                     src={selectedApp.image_main_url || 'https://placehold.co/600x400?text=No+Image'}
                                     alt={selectedApp.name}
                                     className="h-64 rounded-lg object-contain shadow-2xl"
-                                    draggable="true"
-                                    onDragStart={(e) => {
-                                        e.dataTransfer.setData("text/plain", selectedApp.image_main_url);
-                                        e.dataTransfer.effectAllowed = "copy";
-                                    }}
                                 />
-                                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
-                                    <span className="text-white font-bold flex items-center gap-2 pointer-events-none">
-                                        <Maximize2 size={20} /> Drag to WhatsApp
+                                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg pointer-events-none">
+                                    <span className="text-white font-bold flex items-center gap-2">
+                                        <Maximize2 size={20} /> Ver em Tela Cheia
                                     </span>
                                 </div>
                             </div>
-                            <p className="mt-3 text-sm text-primary font-medium flex items-center gap-2">
+
+                            <Button
+                                onClick={() => selectedApp.image_main_url && handleCopyImage(selectedApp.image_main_url)}
+                                className="bg-primary hover:bg-primaryHover text-white px-8 py-6 rounded-xl flex items-center gap-3 shadow-lg transform active:scale-95 transition-all text-lg font-bold"
+                            >
+                                <ImageIcon size={24} />
+                                COPIAR IMAGEM
+                            </Button>
+                            <p className="mt-3 text-sm text-textMuted font-medium flex items-center gap-2">
                                 <Smartphone size={16} />
-                                {t('apps.dragText')}
+                                Clique para copiar e cole (Ctrl+V) no WhatsApp Web
                             </p>
                         </div>
 
@@ -511,7 +541,7 @@ const Apps = () => {
                 </div>
             )}
 
-            <Toast message={t('common.copied')} visible={toastVisible} />
+            <Toast message={toastMessage || t('common.copied')} visible={toastVisible} />
         </div>
     );
 };
