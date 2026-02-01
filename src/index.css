@@ -1,0 +1,76 @@
+@import "tailwindcss";
+@config "../tailwind.config.js";
+
+@layer base {
+  :root {
+    /* Light Mode Tokens */
+    --background: #F3F4F6;
+    /* Gray 100 */
+    --surface: #FFFFFF;
+    /* White */
+    --surface-highlight: #E5E7EB;
+    /* Gray 200 */
+    --primary: #FF7A18;
+    --primary-hover: #F68A1F;
+    --secondary: #F9FAFB;
+    /* Gray 50 */
+    --text-main: #111827;
+    /* Gray 900 */
+    --text-muted: #6B7280;
+    /* Gray 500 */
+    --border: #E5E7EB;
+    /* Gray 200 */
+  }
+
+  .dark {
+    /* Dark Mode Tokens (Existing Identity) */
+    --background: #0B0D10;
+    --surface: #161A20;
+    --surface-highlight: #1B2028;
+    --primary: #FF7A18;
+    --primary-hover: #F68A1F;
+    --secondary: #2A2E35;
+    --text-main: #FFFFFF;
+    --text-muted: #9CA3AF;
+    --border: #27272A;
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--text-main);
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition-property: background-color, border-color, color, fill, stroke;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 300ms;
+  }
+
+  /* Smooth transitions for theme switching */
+  *,
+  *::before,
+  *::after {
+    transition-property: background-color, border-color, color, fill, stroke;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+  }
+
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--background);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--secondary);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--primary);
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "name": "UniversaTV Seller Desk",
+  "description": "Internal tool for IPTV sellers to manage scripts, apps, and support via WhatsApp Web.",
+  "requestFramePermissions": []
+}
