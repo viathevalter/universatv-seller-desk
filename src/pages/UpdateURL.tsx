@@ -142,7 +142,9 @@ const UpdateURL = () => {
                             <div>
                                 <label className="block text-xs font-bold text-textMuted uppercase mb-2">URL Final (com VPS)</label>
                                 <div className="space-y-4">
-                                    <Input value={finalUrl} readOnly className="font-mono text-sm bg-surfaceHighlight/20 p-4 min-h-[50px] text-lg" />
+                                    <div className="w-full bg-surfaceHighlight/20 border border-border rounded-lg p-4 font-mono text-lg text-textMain break-all min-h-[80px] flex items-center">
+                                        {finalUrl || <span className="text-textMuted opacity-50">A URL gerada aparecerá aqui...</span>}
+                                    </div>
                                     <div className="flex gap-4">
                                         <Button
                                             onClick={() => setOriginalUrl('')}
